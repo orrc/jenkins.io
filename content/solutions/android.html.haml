@@ -39,10 +39,89 @@ plugins:
 
   When combined with the [Google Play Publisher
   plugin](https://wiki.jenkins-ci.org/display/JENKINS/Google+Play+Android+Publisher+Plugin),
-  Android developers can build true continuous delivery pipeline, sending
-  builds to an alpha channel in Google Play for release or further testing.
+  Android developers can build a true continuous delivery pipeline, sending
+  app builds to the alpha channel in Google Play for further testing, then later
+  promoting the app to production.
 
+  ## Project setup
+  ### Automatically installing Android build prerequisites
+  In order to minimise the amount of setup required on your various Jenkins
+  build agents, there are a few changes you can make to your Android project
+  setup to make your life a bit easier.
 
+  Building a typical Android app requires that you have numerous components
+  installed on your machine: the Android SDK Tools, Platform Tools, the Android
+  Platform version you're building against (the `compileSdkVersion` in your
+  `build.gradle` file), plus likely the Android Support Library repository, and
+  perhaps the Google repository (for Google Play Services etc.).
+
+  Ensuring that these dependencies are installed and kept up-to-date for every
+  app that you want to build is time-consuming — even more so when you have
+  multiple build agents.  Therefore a recommended practice is to add the
+  [Android SDK Manager Gradle
+  plugin](https://github.com/JakeWharton/sdk-manager-plugin) to your project,
+  which will ensure, at build time, that the relevant dependencies are installed
+  on the machine where the app is being built.  Just follow the few simple steps
+  in the README on GitHub and you're all set.
+  While this plugin works for most projects, it can sometimes have problems with
+  more complex setups, but it's generally a good thing to have in your project.
+  There is an [Android feature request](http://b.android.com/TODO) open, requesting that a mechanism like this becomes part of the official Android build system, so hopefully this will be implemented one day...
+
+  ### Manually installing Android build prerequisites
+  TODO: Command line hints for `android update sdk -u`
+
+  ### Sharing keystores
+  In order to install an Android app (APK file) it needs to be cryptographically
+  signed using a Java keystore.  For debug app builds, this keystore file is
+  generated automatically by the Android build system the first time it is used. {TODO: link to where this is on the filesystem}.
+
+  However, if you have an Android app installed on your phone, and you want to
+  install an updated version, both the existing and new APKs must have been
+  signed with the same keystore, otherwise installation will fail.
+
+  This situation can arise often, for example, if one developer wants to share
+  an APK with you that was built on their machine — they will have a different
+  debug keystore to yours, causing installation to fail.  Similarly, if you have
+  a debug APK installed on your device, and you download a new build from
+  Jenkins and try to install it, you'll end up with the same failure.
+
+  To avoid such problems, we can ensure that all debug versions of an app are
+  built with the same keystore.  We can do this by generating a new debug
+  keystore file, checking it into the source control repository, and telling
+  the Android build system to use it when signing APKs of the debug build type.
+
+  TODO: List
+  1. Generate a debug keystore in the root of your project, using the same
+     configuration that the Android build system uses:
+
+     ```keytool -genkey -v -keystore debug.keystore -keyalg RSA -keysize 2048 \
+      -validity 10000 -dname 'C=US, O=Android, CN=Android Debug' \
+      -alias androiddebugkey -keypass android -storepass android```
+
+  2. Add it to the Gradle file:
+
+     android {
+         signingConfigs {
+             debug {
+                 storeFile file('../debug.keystore')
+             }
+         }
+     }
+
+  >>> archiving
+
+  ## Building Android apps
+  The Android build system is built upon Gradle ... Jenkins supports this ...
+
+  ## Testing and verifying Android apps
+  ### Unit tests
+  >>> JVM
+
+  ### Instrumentation tests
+  >>> Emulator plugin
+
+  ### Static analysis
+  >>> Lint
 
   ## Presentations
 
