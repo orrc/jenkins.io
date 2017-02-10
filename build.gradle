@@ -51,8 +51,6 @@ dependencies {
     asciidoctor 'rubygems:awestruct:[0.5.7,0.6)'
     /* ensure we pull in a more recent version of asciidoctor */
     asciidoctor 'rubygems:asciidoctor:[1.5.5,2.0)'
-    /* used for legacy markdown template processing via tilt */
-    asciidoctor 'rubygems:kramdown:[1.9.0,2.0)'
     /* contains a number of useful awestruct extensions */
     asciidoctor 'rubygems:awestruct-ibeams:[0.4.1,)'
     /* 1.2.0 causes 'C extensions are not supported' error. It's known that
@@ -94,22 +92,9 @@ dependencies {
     externalFetcher localGroovy()
 }
 
-/* for fetching javascript assets that we need for building the legacy and new
- * versions of the site
- */
+/* for fetching javascript assets that we need for building the site */
 bower {
     /* weird syntax is weird */
-
-    /* jQuery and jQuery UI are both used by the "legacy" download picker and
-     * can likely go away once the legacy site is sunsetted
-     */
-    'jquery' ('1.11.3') {
-        source 'dist/**'
-    }
-    'jquery-ui' ('1.11.4') {
-        source '**/*.js'
-        source 'themes/base/**' >> 'themes/base/'
-    }
 
     /* needed for jenkins.io */
 
